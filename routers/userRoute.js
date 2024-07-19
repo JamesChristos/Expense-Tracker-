@@ -103,38 +103,32 @@ router.get('/reset-password/:id/:token', async function (req, res) {
   }
 });
 
-router.post('/reset-password/:id/:token', async function (req, res) {
+router.post("/reset-password/:id/:token", async function (req, res) {
   const { id, token } = req.params;
   const { password, confirmPassword } = req.body;
 
   try {
-    console.log('Received password reset request:', { id, token, password });
+    console.log("Received password reset request:", { id, token, password });
 
     const oldUser = await User.findOne({ _id: id });
     if (!oldUser) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     const secret = JWT_SECRET + oldUser.password;
-    console.log('Verifying token with secret:', secret);
+    console.log("Verifying token with secret:", secret);
 
     const payload = jwt.verify(token, secret);
-    console.log('Token verification successful. Payload:', payload);
-
-    // Compare the new password with the confirmed password
-    console.log('Comparing passwords:', { password, confirmPassword });
-    if (password !== confirmPassword) {
-      return res.status(400).json({ error: 'Password and confirmPassword do not match' });
-    }
+    console.log("Token verification successful. Payload:", payload);
 
     // Update the user's password
     oldUser.password = password;
     await oldUser.save();
 
-    res.status(200).json({ message: 'Password updated successfully' });
+    res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
-    console.error('Error in password reset route:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error in password reset route:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

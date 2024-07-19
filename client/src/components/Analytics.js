@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import '../resources/analytics.css';
 import { Progress } from 'antd';
@@ -57,17 +56,22 @@ function Analytics({ transaction }) {
             {
                 label: 'Income',
                 data: incomeAmounts,
-                borderColor: '#36A2EB',
-                fill: false,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.5)', // 50% transparent blue
+                fill: true,
+                tension: 0.5,
             },
             {
                 label: 'Expense',
                 data: expenseAmounts,
-                borderColor: '#E74C3C',
-                fill: false,
+                borderColor: 'rgba(231, 76, 60, 1)',
+                backgroundColor: 'rgba(231, 76, 60, 0.5)', // 50% transparent red
+                fill: true,
+                tension: 0.5,
             },
         ],
     };
+    
 
     // Line chart options
     const lineChartOptions = {
@@ -134,24 +138,28 @@ function Analytics({ transaction }) {
     // Bar chart data
     const barChartData = {
         labels: barChartLabels,
-        datasets: [
-            {
+        datasets: [{
                 label: 'Income',
                 data: barChartIncomeData,
-                backgroundColor: '#36A2EB',
-                barThickness: 15,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)', // 50% transparent blue
+                borderColor: 'rgba(54, 162, 235, 1)', // Border color for blue bars
+                borderWidth: 1, // Border width
+                barThickness: 30, // Increased bar thickness
             },
             {
                 label: 'Expense',
                 data: barChartExpenseData,
-                backgroundColor: '#E74C3C',
-                barThickness: 15,
+                backgroundColor: 'rgba(231, 76, 60, 0.5)', // 50% transparent red
+                borderColor: 'rgba(231, 76, 60, 1)', // Border color for red bars
+                borderWidth: 1, // Border width
+                barThickness: 30, // Increased bar thickness
             },
         ],
-    };
+    };  
 
     // Bar chart options
     const barChartOptions = {
+        indexAxis: 'x', // Display bars horizontally
         scales: {
             x: {
                 stacked: false, // Remove stacking for x-axis
@@ -191,103 +199,135 @@ function Analytics({ transaction }) {
     const incomeCategories = Object.keys(incomeCategoryData);
     const incomeCategoryValues = incomeCategories.map(category => incomeCategoryData[category]);
 
-    // Pie chart data for income
     const incomePieChartData = {
         labels: incomeCategories,
-        datasets: [
-            {
-                data: incomeCategoryValues,
-                backgroundColor: [
-                    '#FF6384',
-                    '#36A2EB',
-                    '#FFCE56',
-                    '#7DCEA0',
-                    '#FADBD8',
-                    '#C0392B',
-                    '#154360',
-                    '#512E5F',
-                    '#F39C12',
-                    '#ABEBC6',
-                    '#D2B4DE',
-                    '#F9E79F',
-                    '#626567',
-                    '#641E16',
-                    '#C0392B',
-                ],
-                hoverBackgroundColor: [
-                    '#FF6384',
-                    '#36A2EB',
-                    '#FFCE56',
-                    '#7DCEA0',
-                    '#FADBD8',
-                    '#C0392B',
-                    '#154360',
-                    '#512E5F',
-                    '#F39C12',
-                    '#ABEBC6',
-                    '#D2B4DE',
-                    '#F9E79F',
-                    '#626567',
-                    '#641E16',
-                    '#C0392B',
-                ],
-            },
-        ],
+        datasets: [{
+            data: incomeCategoryValues,
+            backgroundColor: [
+                'rgba(70, 130, 180, 0.5)',   
+                'rgba(255, 69, 0, 0.5)',     
+                'rgba(50, 205, 50, 0.5)',    
+                'rgba(255, 215, 0, 0.5)',    
+                'rgba(199, 21, 133, 0.5)',   
+                'rgba(0, 206, 209, 0.5)',    
+                'rgba(128, 0, 0, 0.5)',      
+                'rgba(75, 0, 130, 0.5)',    
+                'rgba(255, 165, 0, 0.5)',    
+                'rgba(34, 139, 34, 0.5)',    
+                'rgba(255, 20, 147, 0.5)',  
+                'rgba(0, 191, 255, 0.5)',    
+                'rgba(160, 82, 45, 0.5)',
+                'rgba(128, 128, 128, 0.5)',
+                'rgba(47, 79, 79, 0.5)',   
+            ],
+            borderColor: [
+                'rgba(70, 130, 180, 1)', 
+                'rgba(255, 69, 0, 1)',   
+                'rgba(50, 205, 50, 1)',    
+                'rgba(255, 215, 0, 1)', 
+                'rgba(199, 21, 133, 1)', 
+                'rgba(0, 206, 209, 1)',    
+                'rgba(128, 0, 0, 1)',    
+                'rgba(75, 0, 130, 1)',    
+                'rgba(255, 165, 0, 1)',   
+                'rgba(34, 139, 34, 1)',    
+                'rgba(255, 20, 147, 1)',   
+                'rgba(0, 191, 255, 1)',    
+                'rgba(160, 82, 45, 1)',    
+                'rgba(128, 128, 128, 1)',  
+                'rgba(47, 79, 79, 1)',   
+            ],
+            
+            borderWidth: 1,
+            hoverOffset: 4,
+        }, ],
     };
-
+    
     const incomePieChartOptions = {
         maintainAspectRatio: false,
         plugins: {
             legend: {
                 display: true,
                 position: 'right',
+                labels: {
+                    boxWidth: 15, // Adjust legend item size
+                },
             },
         },
     };
+    
 
-        // Calculate category data for expenses
-        const expenseCategoryData = transaction.reduce((acc, { type, category, amount }) => {
-            if (type === 'Expense') {
-                if (!acc[category]) {
-                    acc[category] = 0;
-                }
-                acc[category] += amount;
+    // Calculate category data for expenses
+    const expenseCategoryData = transaction.reduce((acc, { type, category, amount }) => {
+        if (type === 'Expense') {
+            if (!acc[category]) {
+                acc[category] = 0;
             }
-            return acc;
-        }, {});
-    
-        // Extract categories and respective expense values for chart display
-        const expenseCategories = Object.keys(expenseCategoryData);
-        const expenseCategoryValues = expenseCategories.map(category => expenseCategoryData[category]);
-    
-        // Pie chart data for expenses
-        const expensePieChartData = {
-            labels: expenseCategories,
-            datasets: [
-                {
-                    data: expenseCategoryValues,
-                    backgroundColor: [
-                        '#FF6384', '#36A2EB', '#FFCE56', '#7DCEA0', '#FADBD8', '#C0392B', '#154360', '#512E5F', '#F39C12', '#ABEBC6',
-                        '#D2B4DE', '#F9E79F', '#626567', '#641E16', '#C0392B',
-                    ],
-                    hoverBackgroundColor: [
-                        '#FF6384', '#36A2EB', '#FFCE56', '#7DCEA0', '#FADBD8', '#C0392B', '#154360', '#512E5F', '#F39C12', '#ABEBC6',
-                        '#D2B4DE', '#F9E79F', '#626567', '#641E16', '#C0392B',
-                    ],
-                },
+            acc[category] += amount;
+        }
+        return acc;
+    }, {});
+
+    // Extract categories and respective expense values for chart display
+    const expenseCategories = Object.keys(expenseCategoryData);
+    const expenseCategoryValues = expenseCategories.map(category => expenseCategoryData[category]);
+
+    const expensePieChartData = {
+        labels: expenseCategories,
+        datasets: [{
+            data: expenseCategoryValues,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.5)',
+                'rgba(54, 162, 235, 0.5)',
+                'rgba(255, 206, 86, 0.5)',
+                'rgba(75, 192, 192, 0.5)',
+                'rgba(153, 102, 255, 0.5)',
+                'rgba(255, 159, 64, 0.5)',
+                'rgba(255, 99, 132, 0.5)',
+                'rgba(54, 162, 235, 0.5)',
+                'rgba(255, 206, 86, 0.5)',
+                'rgba(75, 192, 192, 0.5)',
+                'rgba(153, 102, 255, 0.5)',
+                'rgba(255, 159, 64, 0.5)',
+                'rgba(255, 99, 132, 0.5)',
+                'rgba(54, 162, 235, 0.5)',
+                'rgba(255, 206, 86, 0.5)',
             ],
-        };
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+            ],
+            borderWidth: 1, // Border width
+            hoverOffset: 4, // Distance when hovering over a slice
+        }, ],
+    };
     
-        const expensePieChartOptions = {
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'right',
+    const expensePieChartOptions = {
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'right',
+                labels: {
+                    boxWidth: 15, // Adjust legend item size
                 },
             },
-        };
-
+        },
+    };
+    
     const totalTransaction = transaction.length;
     const totalIncomeTransaction = transaction.filter(item => item.type === 'Income').length;
     const totalExpenseTransaction = transaction.filter(item => item.type === 'Expense').length;
@@ -405,10 +445,10 @@ function Analytics({ transaction }) {
                     </div>
                 </div>
                 <div className='col-md-4 mt-3'>
-                    <div className='transaction-count' style={{ height: '314px', width: '476px'}}>
+                    <div className='transaction-count' style={{ height: '302px', width: '476px'}}>
                         <h4>Income and Expense Trends</h4>
                         <hr />
-                        <Line ref={chartRef} data={lineChartData} options={lineChartOptions} />
+                        <Line className="mt-2" ref={chartRef} data={lineChartData} options={lineChartOptions} />
                     </div>
                 </div>
             </div>
@@ -417,21 +457,21 @@ function Analytics({ transaction }) {
                     <div className='transaction-count'>
                         <h4>Monthly Income and Expense Analysis</h4>
                         <hr />
-                        <Bar data={barChartData} options={barChartOptions} />
+                        <Bar className="mt-3" data={barChartData} options={barChartOptions} />
                     </div>
                 </div>
                 <div className='col-md-4 mt-3'>
                     <div className='transaction-count' style={{ height: '308px', width: '472px' }}>
                         <h4>Incomes Structure</h4>
                         <hr />
-                        <Doughnut className='mx-3 mb-5' data={incomePieChartData} options={incomePieChartOptions} style={{padding: '1px'}}/>
+                        <Doughnut className='mx-3 mt-3 mb-5' data={incomePieChartData} options={incomePieChartOptions} style={{padding: '1px'}}/>
                     </div>
                 </div>
                 <div className='col-md-4 mt-3'>
                     <div className='transaction-count' style={{ height: '308px', width: '476px' }}>
                         <h4>Expenses Structure</h4>
                         <hr />
-                        <Doughnut className='mx-3 mb-5' data={expensePieChartData} options={expensePieChartOptions} style={{padding: '1px'}}/>
+                        <Doughnut className='mx-3 mt-3 mb-5' data={expensePieChartData} options={expensePieChartOptions} style={{padding: '1px'}}/>
                     </div>
                 </div>
             </div>

@@ -2,17 +2,18 @@ const express = require('express');
 const Budget = require('../models/Budget');
 const router = express.Router();
 
+// Route to add a new budget
 router.post('/add_budgets', async (req, res) => {
     try {
         const newBudget = new Budget(req.body);
         await newBudget.save();
         res.status(201).send('Budget created successfully');
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).send(error.message);
     }
 });
 
-
+// Route to get all budgets for a user
 router.get('/get-all-budgets', async (req, res) => {
     try {
         const userId = req.query.userId;
@@ -23,6 +24,7 @@ router.get('/get-all-budgets', async (req, res) => {
     }
 });
 
+// Route to edit an existing budget
 router.post('/edit_budget', async (req, res) => {
     try {
         const userId = req.body.userId;
@@ -30,31 +32,29 @@ router.post('/edit_budget', async (req, res) => {
 
         const updatePayload = {
             amount: req.body.amount,
+            startDate: req.body.startDate,
             endDate: req.body.endDate,
             remainingDays: req.body.remainingDays,
             category: req.body.category,
             description: req.body.description,
-            // Add other fields as needed
         };
 
-        await Budget.findOneAndUpdate({ _id: budgetId, userId: userId }, updatePayload);
-
+        await Budget.findOneAndUpdate({ _id: budgetId, userId: userId }, updatePayload, { new: true });
         res.send('Budget updated successfully');
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
+// Route to delete an existing budget
 router.post('/delete_budget', async (req, res) => {
     try {
-        const budgetId = req.body.budgetId; // Get the budgetId from the request body
-        await Budget.findOneAndDelete({ _id: budgetId }); // Use _id to identify the specific budget
+        const budgetId = req.body.budgetId;
+        await Budget.findOneAndDelete({ _id: budgetId });
         res.send('Budget deleted successfully');
     } catch (error) {
-        res.status(500).json({ error: error.message })
+        res.status(500).json({ error: error.message });
     }
-})
-
-
+});
 
 module.exports = router;

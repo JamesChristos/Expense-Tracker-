@@ -11,7 +11,7 @@
     "client-install": "npm install --prefix client",
     "server": "nodemon server.js",
     "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server\"\"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "start": "node server.js",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
@@ -25,12 +25,15 @@
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
     "moment": "^2.29.4",
     "mongoose": "^8.0.3",
-    "moongoose": "^0.0.5",
+    "moongoose": "^0.0.1",
     "nodemailer": "^6.9.7",
     "nodemon": "^3.0.2",
     "papaparse": "^5.4.1",
+    "react-google-login": "^5.2.2",
     "tesseract.js": "^5.0.4"
   },
   "proxy": "http://localhost:5000"

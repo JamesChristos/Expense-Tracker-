@@ -1,20 +1,19 @@
 import './App.css';
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Orb from './components/Orbs';
-import Home from './pages/Home';
-import Test from './pages/Test';
-import Login from './pages/Login';
-import Register from './pages/Register';
 import Record from './pages/Record';
-import Forget_Password from './pages/Forget-Password';
-import Reset_Password from './pages/Reset-Password';
+import Test from './pages/Test';
+import Loginside from './components/loginSide';
+import RegisterSide from './components/registerSide';
+import ForgotSide from './components/forgotSide';
 import Set_Budget from './pages/Set-budgets';
 import Export from './pages/Export';
 import Plan from './pages/Plan';
+import Resetside from './components/resetSide';
+import Goal from './pages/Goal';
 
 function App() {
-  // Move the useMemo inside the functional component
   const orbMemo = useMemo(() => {
     return <Orb />;
   }, []);
@@ -25,13 +24,14 @@ function App() {
         <Routes>
           <Route path='/' element={<ProtectedRoute><Record /></ProtectedRoute>} />
           <Route path='/test' element={<Test />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/register' element={<Register />} />
-          <Route path='/forget-password' element={<Forget_Password />} />
-          <Route path="/reset-password/:id/:token" element={<Reset_Password />} />
+          <Route path='/login' element={<Loginside />} />
+          <Route path='/register' element={<RegisterSide />} />
+          <Route path='/forget-password' element={<ForgotSide />} />
+          <Route path="/reset-password/:id/:token" element={<Resetside />} />
           <Route path='/Set-budget' element={<Set_Budget />} />
           <Route path='/export' element={<Export />} />
           <Route path='/plan' element={<Plan />} />
+          <Route path='/goals' element={<Goal />} />
         </Routes>
       </BrowserRouter>
     </div>

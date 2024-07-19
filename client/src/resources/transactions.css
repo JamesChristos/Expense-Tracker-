@@ -5,6 +5,40 @@
 
 }
 
+.transaction-form input {
+    border: 1px solid gainsboro;
+    border-bottom: 1px solid gainsboro;
+    border-radius: 5px;
+    font-size: 14px;
+    padding: 4px;
+    padding-left: 10px;
+}
+
+.transaction-form textarea {
+    border: 1px solid gainsboro;
+    border-bottom: 1px solid gainsboro;
+    border-radius: 5px;
+    font-size: 14px;
+    padding: 4px;
+    padding-left: 10px;
+}
+
+.category-name {
+    font-size: 15px;
+    font-family: poppins, sans-serif;
+    color: #176f44;
+}
+
+.transaction-form input:focus {
+    border: 1px solid gainsboro;
+    border-bottom: 1px solid gainsboro;
+}
+
+.input {
+    border-radius: 15px;
+    border-color: gainsboro; /* Move the text to the right by 10px */
+}
+
 .transaction-form {
     color: gray;
 }
@@ -109,7 +143,7 @@
 }
 
 .OCR_button {
-    background-color: #161c51;
+    background-color: #176f44;
     border-radius: 5px;
     color: aliceblue;
     padding: 8px 10px;
@@ -143,14 +177,29 @@
     margin-top: 2px;
 }
 
-.filter button.primary {
-    background-color: #161c51;
+button.primary {
+    background-color: #176f41;
     color: #fff;
     border: none;
     padding: 8px 15px;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
+
+button.primary:hover {
+    background-color: #145d36;
+}
+
+button.primary:active {
+    transform: scale(0.95);
+}
+
+button.primary.mx-3 {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
 
 .table-analytics {
     margin-top: 20px;
@@ -173,7 +222,7 @@
 }
 
 .ant-table-thead th {
-    background-color: #161c51;
+    background-color: #00915f;
     color: #fff;
 }
 
@@ -189,8 +238,7 @@
     font-size: 34px;
     font-weight: bold;
     text-align: center;
-    color: #161c51;
-    font-family: 'Poppins', sans-serif;
+    color: #176f44;
 }
 
 /* Add these styles to your transactions.css file or create a new CSS file */
@@ -201,8 +249,8 @@
 
 .budget-item {
     border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
+    border-radius: 10px;
+    padding: 20px;
     margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
@@ -229,6 +277,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 1px;
+    margin-top: 10px;
 }
 
 .budget-item-info span {
@@ -238,6 +288,7 @@
 .budget-item-actions {
     display: flex;
     align-items: center;
+    margin-top: 35px;
 }
 
 .budget-item-actions button {
@@ -245,99 +296,143 @@
     cursor: pointer;
 }
 
-/* PlanItem.css */
-
-.plan-item-card {
-    background-color: #f0f0f0;
-    border: 1px solid #d9d9d9;
-    padding: 16px;
-    margin-bottom: 16px;
+/* Goal.css */
+.goal-table {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
 
-.plan-item-card h3 {
-    color: #1890ff;
+.goal-item {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    display: grid;
+    flex-direction: column;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.plan-item-card p {
-    color: #161c51;
-    margin-bottom: 8px;
+@media (max-width: 1200px) {
+    .goal-item {
+        width: calc(50% - 20px);
+    }
 }
 
-.plan-item-card button {
-    color: #fff;
-    border: none;
-    padding: 8px 16px;
+@media (max-width: 768px) {
+    .goal-item {
+        width: calc(100% - 20px);
+    }
+}
+
+
+.goal-item:hover {
+    background-color: #f5f5f5;
+}
+
+.goal-item-details {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.goal-item-category {
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.goal-item-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1px;
+}
+
+.goal-item-info span {
+    margin-right: 10px;
+}
+
+.goal-item-actions {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.goal-item-actions button {
+    margin-left: 5px;
     cursor: pointer;
 }
 
-.plan-item-card button:hover {
-    background-color: gray;
-    /* Darker shade on hover */
-}
-
-.plan-item-card {
+.progress-container {
     position: relative;
 }
 
-.plan-item-header {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 10px;
-    z-index: 1;
+.progress-top {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
 }
 
-/* Remove background color for the Options button */
-.plan-item-header .ant-btn-primary {
-    background-color: transparent;
-    border: none;
-    color: #1890ff;
-    /* Set the desired text color */
+.target-amount {
+    font-size: 25px;
+    font-weight: bold;
 }
 
-/* Style for the Delete button (optional) */
-.plan-item-header .ant-btn-danger {
-    background-color: transparent;
-    border: none;
+.remain-days {
+    font-size: 18px;
+    color: #999da0;
+    font-weight: bold;
+    margin-top: 10px;
 }
 
-/* transactions.css (or any other appropriate CSS file) */
+.progress-mid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
 
-.plan-item-card {
+.progress-bottom {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+}
+
+.add-money-btn{
+    color: #00915f;
+}
+
+.toggle-buttons {
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.custom-segmented .ant-segmented-item {
     position: relative;
-}
-
-.plan-item-header {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 10px;
     z-index: 1;
+    padding: 3px;
+    border-radius: 6px;
+    transition: margin 0.3s, z-index 0.3s, transform 0.3s;
+    background-color: #fff;
+    color: #000;
 }
 
-/* Remove background color for the Options button */
-.plan-item-header .ant-btn-primary {
-    background-color: transparent;
-    color: #1890ff;
-    /* Set the desired text color */
+.custom-segmented .ant-segmented-item:hover {
+    z-index: 2;
 }
 
-/* Style for the Delete button (optional) */
-.plan-item-header .ant-btn-danger {
-    background-color: transparent;
-    border: none;
-    /* Set the desired text color */
+.custom-segmented .ant-segmented-item-selected {
+    background-color: #176f44 !important;
+    color: white !important;
+    z-index: 3;
+    transform: scale(1.1); /* Make the selected segment bigger */
+    transition: margin 0.3s, z-index 0.3s, transform 0.3s;
 }
 
-/* Position the dropdown menu below the header */
-.plan-item-header .ant-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-}
-
-/* Style for the dropdown menu items (optional) */
-.plan-item-header .ant-dropdown-menu-item {
-    padding: 8px 15px;
-    color: #1890ff;
+.goal-name {
+    font-size: 15px;
+    font-family: poppins, sans-serif;
+    color: #176f44;
 }

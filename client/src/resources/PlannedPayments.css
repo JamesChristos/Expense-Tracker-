@@ -1,120 +1,207 @@
-/* PlannedPayments.css */
-
-.planned-payments-summary {
-  margin-bottom: 30px;
-}
-
-.planned-payments-summary h1 {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.planned-payments-summary h2 {
-  font-size: 36px;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-.planned-payment-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.planned-payment-item .category {
-  flex: 1;
-  font-weight: bold;
-}
-
-.planned-payment-item .amount {
-  flex: 0 0 auto;
-  padding: 0 16px;
-  font-weight: bold;
-}
-
-.add-plan-form {
-  max-width: 600px;
-  margin-bottom: 30px;
-}
-
-/* List item styles */
-.ant-list-item {
-  padding: 12px 24px;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
-}
-
-.ant-list-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Progress bar styles */
-.ant-progress-bg {
-  height: 10px !important;
-  /* Override default height */
-  border-radius: 5px;
-  /* Rounded corners for progress bar */
-}
-
-/* Edit and Delete icon styles */
-.anticon {
-  font-size: 18px;
-  cursor: pointer;
-  color: #555;
-}
-
-.anticon:hover {
-  color: #1890ff;
-}
-
-/* Popconfirm styles */
-.ant-popover {
-  font-size: 14px;
-  /* Adjust the font size if necessary */
-}
-
-/* Add more custom styles as needed */
+/* General styles */
 .planned-payments-summary {
   text-align: center;
-  margin: 20px;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 16px;
+  border: #bdbcbc solid 1px;
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1);
 }
-
+  
 h1 {
-  color: #333;
-}
-
-h2 {
-  color: #555;
-}
-
-.planned-payments-summary {
-  text-align: center;
-  margin: 20px;
-  background-color: #f4f4f4;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-  color: #3498db;
+  color: #000000;
   font-size: 30px;
+  font-weight: bold;
+  text-align: start;
+  margin-left: 10px;
 }
 
 h2 {
-  color: #2ecc71;
-  font-size: 24px;
-  margin-bottom: 10px;
+  color: #176f44;
+  font-size: 30px;
+  margin-left: 20px;
 }
 
 /* Style for PlanItem container */
 .plan-items-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
+  
+/* Individual PlanItem styles */
+.plan-item-card {
+  background-color: #ffffff;
+  border: 1px solid #c6c5c5;
+  border-radius: 26px;
+  padding: 20px;
+  position: relative;
+  margin-top: 25px;
+  transition: box-shadow 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.plan-item-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.plan-item-card h3 {
+  color: #239050;
+  text-align: start;
+  margin-bottom: 5px;
+  margin-top: -25px;
+  margin-left: -25px;
+  font-size: small;
+  font-weight: bold;
+  font-family: 'Poppins', sans-serif;
+}
+
+.plan-item-card p3 {
+  display: block; /* or inline-block */
+  color: #000000;
+  text-align: start;
+  margin-bottom: 10px;
+  font-size: 50px;
+  font-weight: bold;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.plan-item-card p4 {
+  color: #b7b7b7;
+  text-align: start;
+  font-weight: bold;
+  font-size: 10px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.plan-item-card p5 {
+  color: #176f44;
+  margin-bottom: 8px;
+}
+
+.plan-item-card button {
+  color: #fff;
+  background-color: #d4d4d4;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.plan-item-card button:hover {
+  background-color: #757575; /* Darker shade on hover */
+}
+
+.plan-item-header {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.custom-button {
+  background-color: #176f44;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.custom-button:hover {
+  background-color: #176f44; /* Darker shade for hover effect */
+}
+
+.plan-item-header .ant-btn-primary {
+  background-color: transparent;
+  color: #000000;
+  border: none;
+} 
+
+.plan-item-header .ant-btn-primary:hover {
+  color: #000000;
+}
+
+.plan-item-header .ant-btn-danger {
+  background-color: transparent;
+  color: #f5222d;
+  border: none;
+  margin-left: 8px;
+}
+
+.plan-item-header .ant-btn-danger:hover {
+  color: #a8071a;
+}
+
+.plan-item-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 8px;
+  z-index: 1;
+}
+
+.plan-item-dropdown .ant-dropdown-menu-item {
+  padding: 8px 15px;
+  color: #3c546a;
+}
+
+.plan-item-dropdown .ant-dropdown-menu-item:hover {
+  background-color: #e6f7ff; /* Lighter shade on hover */
+}
+
+.dot-container {
+  display: flex;
+  justify-content: start; /* Align items to the start (left) */
+  margin-top: 22px;
+  margin-left: 4px;
+}
+
+.dot {
+  background-color: #176f44;
+  border-radius: 50%;
+  height: 8px;
+  width: 8px;
+}
+
+.plan-item-card p6 {
+  display: block;
+  text-align: start;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  margin-left: 20px;
+  margin-top: -15px;
+}
+
+.countdown {
+  justify-content: start;
+  font-size: 14px !important;
+}
+
+.btn_container {
+  display: flex;
+  justify-content: center; /* Center align horizontally */
+  align-items: center; /* Center align vertically */
+  margin-top: 60px; /* Adjust as needed */
+  margin-bottom: -20px;
+}
+
+.btn_del {
+  width: 100%;
+  padding: 20px 20px; /* Adjust padding for desired button size */
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  font-weight: 600;
+  border: #176f44 solid 2px !important;
+  transition: background-color 0.3s ease;
+  color: #176f44 !important;
+  background-color: #ffffff !important;
+}
+
+.btn_del:hover {
+  background-color: #176f44 !important; /* Hover background color */
+  color: white !important;
+}

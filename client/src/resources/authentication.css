@@ -3,13 +3,17 @@
 }
   
 .custom-button {
-    background-color: #00AA70; /* Change to your desired background color */
+    background-color: #176f44; /* Change to your desired background color */
     color: #fff; /* Text color */
     transition: background-color 0.3s; /* Transition for smooth color change on hover */
 }
 
 .custom-button:hover {
-    background-color: #00915f!important; 
+    background-color: #176f44!important; 
+}
+
+.bg-custom-color {
+  background-color: #176f44;
 }
 
 .register {
@@ -28,4 +32,63 @@
 
 .header-lottie {
   padding-left: 80px;
+  font-size: 30px;
+  
+}
+
+/* Custom CSS for the Sign In button */
+.sign-in-button {
+  padding: 10px 20px; /* Adjust padding as needed */
+  background-color: #176f44; /* Bootstrap primary color */
+  color: #fff; /* Text color */
+  border: none;
+  border-radius: 15px; /* Rounded corners */
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.sign-in-button:hover {
+  background-color: #0b462e; /* Darker shade of primary color on hover */
+}
+
+.Link-Signup {
+  color: #176f44;
+}
+
+.Link-Signup:hover {
+  color: #0b462e;
+}
+
+/* CSS for resizing placeholder text and border */
+.custom-input {
+  width: 100%; /* Full width */
+  max-width: 400px; /* Maximum width */
+  border-radius: 8px; /* Rounded corners */
+  padding: 12px; /* Padding around the input */
+  font-size: 14px; /* Font size of input text */
+  border: 1px solid #c0c0c0; /* Border color and thickness */
+  background-color: #edf2f6;
+}
+
+.custom-input::placeholder {
+  font-size: 14px; /* Font size of placeholder text */
+  color: #b5b5b5; /* Placeholder text color */
+}
+
+.customs-input {
+  width: 100%; /* Adjust the width of the input field */
+  font-size: 14px; /* Set the font size of the input text */
+  padding: 12px; /* Set the padding of the input field */
+  border: 1px solid #ced4da; /* Set the border */
+  border-radius: 8px; /* Set the border radius */
+  max-width: 400px;
+}
+
+.customs-input::placeholder {
+  font-size: 14px;
+  color: #6c757d /* Adjust the font size of the placeholder text */
+}
+
+.custom-message {
+  font-size: 18px; /* Change to your desired size */
 }

@@ -9,8 +9,12 @@ const budgetSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    startDate: {
+        type: String, // Using String for consistency with endDate
+        required: true
+    },
     endDate: {
-        type: Date,
+        type: String, // Using String to store date as string
         required: true
     },
     remainingDays: {

@@ -25,6 +25,7 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
+    goalId: { type: mongoose.Schema.Types.ObjectId, ref: 'Goal' }, // Reference to the goal
 });
 
 const TransactionModel = mongoose.model('Transaction', transactionSchema);

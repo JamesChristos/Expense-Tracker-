@@ -1,124 +1,112 @@
-// ResetPassword.js
-import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, message } from 'antd';
-import { Link, useNavigate, useParams } from 'react-router-dom'; // Import useParams
+import React, { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import Spinner from '../components/Spinner';
-import Orb from '../components/Orbs';
+import { message } from 'antd';
+import "../resources/authentication.css";
 
-function Reset_Password() {
-  const [loading, setLoading] = useState(false);
-  const { id, token } = useParams();
-  const navigate = useNavigate(true);
+const ResetPass = () => {
+    const navigate = useNavigate();
+    const { id, token } = useParams();
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [newPasswordError, setNewPasswordError] = useState('');
+    const [showNewPassword, setShowNewPassword] = useState(false);
 
-  const onFinish = async (values) => {
-    const { password, confirmPassword } = values; // Ensure both values are extracted
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
-    if (password !== confirmPassword) {
-      message.error('Password and Confirm Password do not match');
-      return;
-    }
+    const toggleNewPasswordVisibility = () => {
+        setShowNewPassword(!showNewPassword);
+    };
 
-    try {
-      setLoading(true);
-      await axios.post(`/api/users/reset-password/${id}/${token}`, { password, confirmPassword }); // Include confirmPassword in the payload
-      setLoading(false);
-      message.success('Password updated successfully');
-      // Redirect to login page or any other page after successful password update
-      navigate('/login');
-    } catch (error) {
-      setLoading(false);
-      console.error('Reset Password Error:', error);
-      message.error('Failed to update password. Please try again.');
-    }
-  };
+    const validatePasswordFormat = (value) => {
+        if (!value || !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value)) {
+            setPasswordError('Password must be alphanumerical at least 8 characters.');
+            return false;
+        }
+        setPasswordError('');
+        return true;
+    };
 
+    const onFinished = async () => {
+        if (!password || !newPassword) {
+            message.error('Please fill in all required fields');
+            return;
+        }
 
-  // Custom validation for password format
-  const validatePasswordFormat = (rule, value) => {
-    if (value && !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value)) {
-      return Promise.reject('Password must be alphanumerical at least 8 characters long');
-    }
-    return Promise.resolve();
-  };
+        if (!validatePasswordFormat(password) || !validatePasswordFormat(newPassword)) {
+            return;
+        }
 
-  return (
-    <div className='container'>
-      <div className='register'>
-        {loading && <Spinner />}
-        <div className='row align-items-center'>
-          {/* Left side content */}
-          <div className='col-lg-6'>
-            <div className='d-none d-lg-block'>
-              <div className='lottie-player'>
-                <h1 className='header-lottie'>Your Finance in One Place</h1>
-                <lottie-player
-                  src="https://assets3.lottiefiles.com/packages/lf20_06a6pf9i.json"
-                  background="transparent"
-                  speed="1"
-                  loop
-                  autoplay
-                ></lottie-player>
-              </div>
+        if (password !== newPassword) {
+            setNewPasswordError('Passwords do not match');
+            return;
+        }
+
+        try {
+            const response = await axios.post(`/api/users/reset-password/${id}/${token}`, { password, confirmPassword: newPassword });
+            message.success('Password Reset Successfully! Please login to continue.');
+            navigate('/login');
+        } catch (error) {
+            message.error(error.response?.data?.error || 'Password reset failed');
+        }
+    };
+
+    return (
+        <div className='flex flex-col mb-10 mr-10'>
+            <div className='font-bold text-2xl font-inter'>
+                Reset Password <b className='text-white'>sdsadsdasdsd</b>
             </div>
-          </div>
-          {/* Right side content */}
-          <div className='col-lg-6'>
-            <div className='d-flex align-items-center justify-content-center'>
-              <div>
-                <Orb />
-                <h3><b>Reset Password</b></h3>
-                <p className='a1'>Enter Password and Confirm Password to Reset</p>
-                <Form layout='vertical' onFinish={onFinish}>
-                  <Form.Item
-                    label='Password'
-                    name='password'
-                    rules={[
-                      { required: true, message: 'Please input your password!' },
-                      { validator: validatePasswordFormat },
-                    ]}
-                  >
-                    <Input.Password placeholder='Password' />
-                  </Form.Item>
-                  <Form.Item
-                    label='Confirm Password'
-                    name='confirmPassword'
-                    dependencies={['password']}
-                    rules={[
-                      { required: true, message: 'Please confirm your password!' },
-                      ({ getFieldValue }) => ({
-                        validator(_, value) {
-                          if (!value || getFieldValue('password') === value) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject('The two passwords do not match!');
-                        },
-                      }),
-                    ]}
-                  >
-                    <Input.Password placeholder='Confirm Password' />
-                  </Form.Item>
-                  <Form.Item>
-                    <Button type='primary' shape='round' size='large' className='custom-button' block htmlType='submit'>
-                      Enter
-                    </Button>
-                  </Form.Item>
-                  <div className='d-flex justify-content-center align-items-center'>
-                    Don't have an account?&nbsp;
-                    <Link to='/Register'>Register</Link>
-                  </div>
-                  <div className='d-flex justify-content-center align-items-center'>
-                    Or go back to&nbsp;
-                    <Link to='/Login'>Home</Link>
-                  </div>
-                </Form>
-              </div>
+            <label className='flex flex-col mt-8 text-425466 text-xs font-inter font-semibold'>New Password</label>
+            <div className="relative">
+                <input
+                    className="custom-input mt-2"
+                    placeholder="Type your password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <span
+                    className="absolute top-5 right-5 cursor-pointer"
+                    onClick={togglePasswordVisibility}
+                >
+                    {showPassword ? (
+                        <i className="fas fa-eye"></i>
+                    ) : (
+                        <i className="fas fa-eye-slash"></i>
+                    )}
+                </span>
             </div>
-          </div>
+            <div className="text-red-500">{passwordError}</div>
+            <label className='flex flex-col text-xs mt-8 text-425466 font-inter font-semibold'>Confirm Password</label>
+            <div className="relative">
+                <input
+                    className="custom-input mt-2"
+                    placeholder="Type your password"
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                />
+                <span
+                    className="absolute top-5 right-5 cursor-pointer"
+                    onClick={toggleNewPasswordVisibility}
+                >
+                    {showNewPassword ? (
+                        <i className="fas fa-eye"></i>
+                    ) : (
+                        <i className="fas fa-eye-slash"></i>
+                    )}
+                </span>
+            </div>
+            <div className="text-red-500 mb-10">{newPasswordError}</div>
+            <button className="sign-in-button" onClick={onFinished}>Send</button>
+            <p className="text-sm mt-8 font-inter font-semibold items-center ml-20 text-718096">Don't have an account?<Link to="/register"><button className="Link-Signup ml-2 text-black font-semibold">Sign Up</button></Link></p>
+            <p className='text-sm mt-2 font-inter font-semibold items-center text-center text-718096'>Or go back to<Link to="/login"><button className="Link-Signup ml-2 text-black font-semibold">Sign In</button></Link></p>
         </div>
-      </div>
-    </div>
-  );
-}
+    );
+};
 
-export default Reset_Password;
+export default ResetPass;

@@ -12,42 +12,29 @@ router.post('/add_plan', async (req, res) => {
   }
 });
 
-router.post('/edit_plan', async (req, res) => {
-  try {
-    const planId = req.body.planId;
-    const existingPlan = await SubscriptionPlan.findById(planId);
+// router.post('/edit_plan', async (req, res) => {
+//   try {
+//     const planId = req.body.planId;
+//     const existingPlan = await SubscriptionPlan.findById(planId);
 
-    if (!existingPlan) {
-      return res.status(404).send('Plan not found');
-    }
+//     if (!existingPlan) {
+//       return res.status(404).send('Plan not found');
+//     }
 
-    const updatePayload = {
-      name: req.body.name,
-      amount: req.body.amount,
-      category: req.body.category,
-      nextPaymentDate: req.body.nextPaymentDate,
-      description: req.body.description,
-    };
+//     const updatePayload = {
+//       name: req.body.name,
+//       amount: req.body.amount,
+//       category: req.body.category,
+//       nextPaymentDate: req.body.nextPaymentDate,
+//       description: req.body.description,
+//     };
 
-    await SubscriptionPlan.findOneAndUpdate({ _id: planId }, updatePayload);
-    res.send('Plan updated successfully');
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-const onDelete = async (planId) => {
-  setLoading(true);
-  try {
-    await axios.delete(`/api/plans/${planId}`);
-    message.success('Plan deleted successfully');
-    fetchPlans();
-  } catch (error) {
-    message.error('Failed to delete plan');
-  } finally {
-    setLoading(false);
-  }
-};
+//     await SubscriptionPlan.findOneAndUpdate({ _id: planId }, updatePayload);
+//     res.send('Plan updated successfully');
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 router.get('/:userId', async (req, res) => {
   try {
@@ -61,13 +48,11 @@ router.get('/:userId', async (req, res) => {
 router.delete('/:planId', async (req, res) => {
   try {
     const planId = req.params.planId;
-    // Delete the plan by ID
     await SubscriptionPlan.findByIdAndDelete(planId);
     res.status(200).send('Plan deleted successfully');
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 module.exports = router;

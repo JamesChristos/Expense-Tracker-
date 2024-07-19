@@ -3,11 +3,23 @@
 }
 
 .header {
-    background-color: #161c51;
+    background-color: #176f44 !important;
     padding: 20px;
     border-bottom-right-radius: 25px;
     border-bottom-left-radius: 25px;
     box-shadow: 0 0 10px gray;
+}
+
+.setting {
+    color: #176f44;
+    cursor: pointer;
+    font-weight: 400;
+    font-family: poppins, sans-serif;
+    background-color: aliceblue !important;
+}
+
+.setting:hover {
+    color: #176f44 !important;
 }
 
 .logo {
@@ -17,11 +29,6 @@
     cursor: pointer;
 }
 
-.username {
-    font-size: 18px;
-    color: rgba(255, 255, 255, 0.742);
-    margin: 0;
-}
 
 .content {
     height: 85vh;
@@ -92,7 +99,7 @@
 }
 
 .navbar a.active {
-    color: gray;
+    color: #4d455b;
     /* Set the active link color as needed */
     font-weight: bold;
     /* Set the active link font weight as needed */

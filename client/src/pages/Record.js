@@ -30,20 +30,31 @@ function Record() {
 
     useEffect(() => {
         getTransactions();
-
-        // Initialize OCRResult from localStorage
-        const initialOCRResult = JSON.parse(localStorage.getItem('OCRResult')) || {};
-        setOCRResult(initialOCRResult);
-
-        // Log localStorage data for debugging (you can remove this in production)
-        console.log('localStorage OCRResult:', localStorage.getItem('OCRResult'));
     }, [frequency, selectRange, type]);
 
+    const getTransactions = async () => {
+        try {
+            const user = JSON.parse(localStorage.getItem('users'));
+            setLoading(true);
+            const response = await axios.post('/api/transactions/get-all-transactions', {
+                userid: user._id,
+                frequency,
+                ...(frequency === 'custom' && { selectRange }),
+                type,
+            });
+            setTransactionData(response.data);
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            message.error('Something went wrong');
+        }
+    };
+
     const handleButtonClick = async (action) => {
-        if (action === 'add') {
+        if (action === "add") {
             setSelectItemForEdit(null);
             setshowAddEditTransactionModel(true);
-        } else if (action === 'ocr') {
+        } else if (action === "ocr") {
             setOCRResult({}); // Reset OCR result before opening the OCR modal
             setshowOCRModal(true);
         }
@@ -52,44 +63,40 @@ function Record() {
     const performOCR = async () => {
         if (selectedImage) {
             try {
-                setLoading(true);
-
                 // Perform OCR using Tesseract
-                const { data } = await Tesseract.recognize(selectedImage, 'eng');
+                const { data } = await Tesseract.recognize(selectedImage, "eng");
 
-                console.log('OCR Result:', data.text);
+                console.log("OCR Result:", data.text);
 
                 // Continue with parsing the OCR result
                 const parsedData = parseOCRResult(data.text);
 
-                console.log('Parsed Result:', parsedData);
+                console.log("Parsed Result:", parsedData);
 
                 // If parsed data is not empty, add it to the table and localStorage
                 if (Object.keys(parsedData).length > 0) {
-                    const user = JSON.parse(localStorage.getItem('users'));
+                    const user = JSON.parse(localStorage.getItem("users"));
                     parsedData.userid = user._id;
 
                     // Save OCR data to localStorage only if it's not empty
                     if (Object.keys(parsedData).length > 0) {
-                        localStorage.setItem('OCRResult', JSON.stringify(parsedData));
+                        localStorage.setItem("OCRResult", JSON.stringify(parsedData));
                     }
 
                     // Update the local state with the new transaction
                     setTransactionData([...TransactionData, parsedData]);
 
                     // Save OCR data to the server
-                    await axios.post('/api/transactions/add-transaction', parsedData);
+                    await axios.post("/api/transactions/add-transaction", parsedData);
                 }
 
-                setLoading(false);
                 setshowOCRModal(false); // Close the OCR modal after performing OCR
             } catch (error) {
-                console.error('Error during OCR:', error);
-                setLoading(false);
+                console.error("Error during OCR:", error);
                 setshowOCRModal(false); // Close the OCR modal in case of an error
             }
         } else {
-            console.error('No image selected for OCR');
+            console.error("No image selected for OCR");
             setshowOCRModal(false); // Close the OCR modal if no image is selected
         }
     };
@@ -132,49 +139,37 @@ function Record() {
     const parseOCRResult = (ocrText) => {
         const amountRegex = /(\S+)\s+usp/;
         const dateRegex = /Transaction date: ([^\n]+)/;
+        const senderRegex = /Received from ([^\n]+)/;
+        const receiverRegex = /Transfer to ([^\n]+)/;
 
         const amountMatch = ocrText.match(amountRegex);
         const dateMatch = ocrText.match(dateRegex);
+        const senderMatch = ocrText.match(senderRegex);
+        const receiverMatch = ocrText.match(receiverRegex);
 
         if (amountMatch && dateMatch) {
             let amount = parseFloat(amountMatch[1]);
 
             // Determine type based on the sign of the amount
-            const type = amount < 0 ? 'Expense' : 'Income';
+            const type = amount < 0 ? "Expense" : "Income";
 
             // Make sure the amount is positive
             amount = Math.abs(amount);
 
-            const date = moment(dateMatch[1], 'MMM DD, YYYY hh:mm A').format('YYYY-MM-DD');
+            const date = moment(dateMatch[1], "MMM DD, YYYY hh:mm A").format("YYYY-MM-DD");
 
             // Set category as 'Transfer'
-            const category = 'Transfer';
+            const category = "OCR Scan";
 
-            // Placeholder description
-            const description = 'OCR Data';
+            // Determine description based on the type
+            let description = "OCR Data";
+            if (type === "Income" && senderMatch) {
+                description = `Received from ${senderMatch[1]}`;
+            } else if (type === "Expense" && receiverMatch) {
+                description = `Transfer to ${receiverMatch[1]}`;
+            }
 
             return { amount, date, type, category, description };
-        }
-
-        // If no match or missing data, return an empty object
-        return {};
-    };
-
-    const getTransactions = async () => {
-        try {
-            const user = JSON.parse(localStorage.getItem('users'));
-            setLoading(true);
-            const response = await axios.post('/api/transactions/get-all-transactions', {
-                userid: user._id,
-                frequency,
-                ...(frequency === 'custom' && { selectRange }),
-                type,
-            });
-            setTransactionData(response.data);
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-            message.error('Something went wrong');
         }
     };
 
@@ -216,7 +211,6 @@ function Record() {
                 let icon = null;
                 let iconClassName = null;
 
-                // Assign icons based on category names and set respective CSS classes
                 if (text === 'Food & Drink') {
                     icon = <FontAwesomeIcon icon={faUtensils} className='white-icon' />;
                     iconClassName = 'category-icon food-drink';
@@ -332,6 +326,9 @@ function Record() {
                     icon = <FontAwesomeIcon icon={faDice} className='white-icon' />
                     iconClassName = 'category-icon income'
                 } else if (text === 'Transfer') {
+                    icon = <FontAwesomeIcon icon={faMoneyBillTransfer} className='white-icon' />
+                    iconClassName = 'category-icon income'
+                } else if (text === 'OCR Scan') {
                     icon = <FontAwesomeIcon icon={faMoneyBillTransfer} className='white-icon' />
                     iconClassName = 'category-icon income'
                 }
@@ -822,7 +819,7 @@ function Record() {
                         className='primary mx-3'
                         style={{ color: 'aliceblue' }}
                         onClick={() => handleButtonClick('ocr')}>
-                        Perform OCR
+                        PERFORM OCR
                     </button>
                     <button
                         className='primary'
@@ -858,7 +855,7 @@ function Record() {
             </Modal>
             <Modal
                 title={selectItemForEdit ? 'Edit Transaction' : 'Add Transaction'}
-                visible={showAddEditTransactionModel}
+                open={showAddEditTransactionModel}
                 onCancel={() => setshowAddEditTransactionModel(false)}
                 footer={null}
             >
@@ -870,7 +867,7 @@ function Record() {
                     <Form.Item label='Type' name='type'>
                         <Select placeholder='Select type'>
                             <Option value='Income'>Income</Option>
-                            <Option value='Expense'>Expense</Option>
+                            <Option value='Expense'>Expense</Option>    
                         </Select>
                     </Form.Item>
 
@@ -890,11 +887,11 @@ function Record() {
                         />
                     </Form.Item>
 
-                    <Form.Item label="Date" name="date">
+                    <Form.Item className="input" label="Date" name="date">
                         <Input type='date' />
                     </Form.Item>
 
-                    <Form.Item label="Description" name="description">
+                    <Form.Item className="transaction-form" label="Description" name="description">
                         <TextArea type='text' rows={2} />
                     </Form.Item>
 

@@ -9,12 +9,14 @@
     font-size: 20px;
     color: gray !important;
     font-weight: 600;
+    padding: 5px 0;
+    margin-bottom: 5px;
 }
 
 .analytics h5 {
     font-size: 18px;
     color: gray !important;
-    
+    margin-top: 10px;
 }
 
 .category-card {

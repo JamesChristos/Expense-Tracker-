@@ -3,6 +3,8 @@ import DefaultLayout from '../components/DefaultLayout';
 import '../resources/transactions.css';
 import { Form, Modal, Input, Select, TreeSelect, DatePicker, message, Table, Button } from 'antd';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import moment from 'moment';
 import Analytics from '../components/Analytics';
 import Spinner from '../components/Spinner';
@@ -127,6 +129,29 @@ function Export() {
             }
         } catch (error) {
             console.error('Error exporting to CSV', error);
+        }
+    };
+
+    const exportToPDF = () => {
+        try {
+            const doc = new jsPDF();
+            doc.text('Incomes & Expenses Report', 20, 10);
+            const dataToExport = TransactionData.map(({ amount, date, category, description, type }) => [
+                moment(date).format('YYYY-MM-DD'),
+                `$${amount}`,
+                type,
+                category,
+                description,
+            ]);
+
+            doc.autoTable({
+                head: [['Date', 'Amount', 'Type', 'Category', 'Description']],
+                body: dataToExport,
+            });
+
+            doc.save('transactions.pdf');
+        } catch (error) {
+            console.error('Error exporting to PDF', error);
         }
     };
 
@@ -733,17 +758,18 @@ function Export() {
                             <Option value="Expense">Expense</Option>
                         </Select>
                     </div>
-                </div>
-
-                <div className='d-flex'>
-                    <button className='primary' onClick={exportToCSV}>
-                        Export to CSV
-                    </button>
+                    <div className='d-flex flex-column mx-1'>
+                        <h6>Export</h6>
+                        <div className='d-flex'>
+                            <button className='primary' onClick={exportToCSV}>CSV</button>
+                            <button className='primary mx-2' onClick={exportToPDF}>PDF</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             {loading && <Spinner />}
             <div className='table-analytics'>
-                <h1 className='report-header'>Incomes & Expenses Report</h1>
+                <h1 className='report-header'>INCOMES & EXPENSES REPORT</h1>
                 {viewType === 'table' ? <div className='table'>
                     <Table columns={columns} dataSource={TransactionData} />
                 </div> : <Analytics transaction={TransactionData} />}

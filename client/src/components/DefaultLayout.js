@@ -19,9 +19,6 @@ function DefaultLayout(props) {
 
     const menu = (
         <Menu>
-            <Menu.Item key="profile" onClick={handleProfile}>
-                Profile
-            </Menu.Item>
             <Menu.Item key="logout" onClick={handleLogout}>
                 Logout
             </Menu.Item>
@@ -33,19 +30,20 @@ function DefaultLayout(props) {
             <div className='header d-flex justify-content-between align-items-center'>
                 <div className="logo-container mx-2">
                     {/* Logo placeholder */}
-                    <h1 className='logo'>e-Budget</h1>
+                    <h1 className='logo'>AtomSpend</h1>
                 </div>
                 <div>
                     <h1 className='navbar'>
                         <NavLink className="mx-2 mt-4" to='/' exact activeClassName="active">Home</NavLink>
                         <NavLink className="mx-2 mt-4" to='/Set-budget' activeClassName="active">Budget</NavLink>
+                        <NavLink className="mx-2 mt-4" to='/goals' activeClassName="active">Goals</NavLink>
                         <NavLink className="mx-2 mt-4" to='/plan' activeClassName="active">Plan</NavLink>
                         <NavLink className="mx-2 mt-4" to='/Export' activeClassName="active">Export</NavLink>
                     </h1>
                 </div>
                 <div>
                     <Dropdown overlay={menu} placement='bottomLeft'>
-                        <Button className='primary'>{user.name}</Button>
+                        <Button className='setting primary2'>{user.name}</Button>
                     </Dropdown>
                 </div>
             </div>

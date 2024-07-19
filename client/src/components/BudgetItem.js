@@ -23,7 +23,7 @@ const BudgetItem = ({ category, spent, total, endDate, remainingDays }) => {
                 </span>
                 <span>Total: ${total.toFixed(2)}</span>
             </div>
-            <div style={{ backgroundColor: '#ddd', borderRadius: '5px', overflow: 'hidden' }}>
+            <div style={{ backgroundColor: '#ddd', borderRadius: '1px', overflow: 'hidden' }}>
                 <div style={progressBarStyle}></div>
             </div>
             <div style={{ marginTop: '10px' }}>

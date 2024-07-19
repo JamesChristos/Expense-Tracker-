@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import DefaultLayout from '../components/DefaultLayout';
 import '../resources/transactions.css';
-import { Form, Modal, Input, Select, TreeSelect, DatePicker, message, Table, Button, Popconfirm, Progress, notification } from 'antd';
+import { Form, Modal, Input, TreeSelect, DatePicker, message, Button, Popconfirm, Progress, notification, Checkbox, Segmented  } from 'antd';
 import axios from 'axios';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -47,183 +47,229 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
-const { RangePicker } = DatePicker;
 
-function Set_budget() {
-    const [loading, setLoading] = useState(false);
+const Goal = () => {
     const [selectItemForEdit, setSelectItemForEdit] = useState(null);
-    const [showAddEditBudgetModal, setShowAddEditBudgetModal] = useState(false);
-    const [budgets, setBudgets] = useState([]);
-    const [transactions, setTransactions] = useState([]);
-    const [totalSpent, setTotalSpent] = useState({});
-    const [hundredPercentWarnings, setHundredPercentWarnings] = useState([]);
+    const [showAddEditGoalModal, setShowAddEditGoalModal] = useState(false);
+    const [goals, setGoals] = useState([]);
+    const [form] = Form.useForm();
+    const [showAddMoneyModal, setShowAddMoneyModal] = useState(false);
+    const [selectedGoal, setSelectedGoal] = useState(null);
+    const [availableIncome, setAvailableIncome] = useState(0);
+    const [activeTab, setActiveTab] = useState("1");
+    const [noDueDate, setNoDueDate] = useState(false);
 
-    const fetchBudgets = async () => {
+
+    const fetchGoals = async () => {
         try {
             const user = JSON.parse(localStorage.getItem('users'));
-            const response = await axios.get(`/api/budgets/get-all-budgets?userId=${user._id}`);
-            setBudgets(response.data);
+            const response = await axios.get(`/api/goals/get-all-goals?userId=${user._id}`);
+            setGoals(response.data);
         } catch (error) {
-            console.error('Error fetching budgets:', error);
+            console.error('Error fetching goals:', error);
         }
     };
 
-    const fetchTransactions = async (frequency, selectRange, type) => {
+    const fetchGoalCurrentAmount = async (goalId) => {
         try {
-            const user = JSON.parse(localStorage.getItem('users'));
-            const response = await axios.post('/api/transactions/get-all-transactions', {
-                userid: user._id,
-                frequency: frequency,
-                selectRange: selectRange,
-                type: type
-            });
-            return response.data;
+            const response = await axios.get(`/api/goals/get-current-amount/${goalId}`);
+            return response.data.currentAmount;
         } catch (error) {
-            console.error('Error fetching transactions:', error);
-            return [];
+            console.error('Error fetching goal current amount:', error);
         }
-    };
-
-    const calculateTotalSpent = (transactions, budget) => {
-        const filteredTransactions = transactions.filter(transaction => {
-            return transaction.category === budget.category &&
-                new Date(transaction.date) >= new Date(budget.startDate) &&
-                new Date(transaction.date) <= new Date(budget.endDate);
-        });
-
-        const totalSpent = filteredTransactions.reduce((total, transaction) => {
-            return total + transaction.amount;
-        }, 0);
-
-        return totalSpent;
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                await fetchBudgets(); // Ensure budgets are fetched first
-
-                // Fetch transactions with appropriate parameters
-                const frequency = 'custom'; // Adjust this based on your requirement
-                const selectRange = [new Date('2023-01-01'), new Date('2025-12-31')]; // Adjust this based on your requirement
-                const type = 'all'; // Adjust this based on your requirement
-
-                const transactions = await fetchTransactions(frequency, selectRange, type);
-
-                const totalSpentMap = budgets.reduce((acc, budget) => {
-                    acc[budget.category] = calculateTotalSpent(transactions, budget);
-                    return acc;
-                }, {});
-
-                setTotalSpent(totalSpentMap);
-                setTransactions(transactions);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        fetchData();
-    }, [budgets]);
+        fetchGoals();
+    }, []);
 
     const onFinish = async (values) => {
+        notification.success({
+            message: 'Success',
+            description: 'Goal added successfully',
+            duration: 10,
+        });
         try {
             const user = JSON.parse(localStorage.getItem('users'));
-            const endDate = values.dateRange[1].endOf('day').toDate();
+            const targetDate = values.targetDate = 'No due date';
+            if (noDueDate) {
+                values.targetDate = 'No due date';
+            } else {
+                values.targetDate = values.targetDate.endOf('day').toDate();
+            }
             const currentDate = new Date();
 
-            if (endDate < currentDate) {
-                message.error('Transaction date should be within the specified date range.');
+            if (targetDate < currentDate) {
+                message.error('Target date should be in the future.');
                 return;
             }
 
-            let remainingDays = Math.ceil((endDate - currentDate) / (1000 * 60 * 60 * 24));
-            remainingDays = remainingDays < 0 ? 0 : remainingDays;
-
-            const budgetData = {
+            const goalData = {
                 userId: user?._id,
-                amount: values.amount,
-                startDate: values.dateRange[0].startOf('day').toDate(),
-                endDate,
-                remainingDays,
+                name: values.name,
+                targetAmount: values.targetAmount,
                 category: values.category,
+                targetDate,
+                currentAmount: 0,
                 description: values.description,
             };
 
             if (selectItemForEdit) {
-                await axios.post('/api/budgets/edit_budget', {
-                    ...budgetData,
-                    budgetId: selectItemForEdit._id,
+                await axios.post('/api/goals/edit_goal', {
+                    ...goalData,
+                    goalId: selectItemForEdit._id,
                 });
-                message.success('Budget Updated Successfully');
+                message.success('Goal Updated Successfully');
             } else {
-                await axios.post('/api/budgets/add_budgets', budgetData);
-                message.success('Budget Added Successfully');
+                await axios.post('/api/goals/add_goal', goalData);
+                message.success('Goal Added Successfully');
             }
 
-            setShowAddEditBudgetModal(false);
-            fetchBudgets(); // Refresh the list of budgets
+            setShowAddEditGoalModal(false);
+            fetchGoals();
         } catch (err) {
             console.error(err);
             message.error('Something went wrong');
         }
     };
 
-    const deleteBudget = async (budget) => {
+    const deleteGoal = async (goal) => {
         try {
-            await axios.post('/api/budgets/delete_budget', {
-                budgetId: budget._id,
+            await axios.post('/api/goals/delete_goal', {
+                goalId: goal._id,
             });
-            setHundredPercentWarnings(prevWarnings => prevWarnings.filter(id => id !== budget._id));
-            message.success('Budget deleted successfully');
-            fetchBudgets(); // Refresh the list of budgets
+            message.success('Goal deleted successfully');
+            fetchGoals();
         } catch (err) {
-            console.error('Error deleting budget:', err);
+            console.error('Error deleting goal:', err);
             notification.error({
                 message: 'Error',
-                description: 'Something went wrong while deleting the budget.',
+                description: 'Something went wrong while deleting the goal.',
             });
         }
     };
 
-    const disabledDate = (current) => {
-        return current && current < moment().startOf('day');
+    const fetchAvailableIncome = async (userId) => {
+        try {
+            // Make a GET request to the server endpoint
+            const response = await axios.get(`/api/transactions/get-income-transactions?userId=${userId}`);
+            
+            // Extract available income from the response data
+            const availableIncome = response.data.availableIncome;
+            
+            // Update the state with the fetched available income
+            setAvailableIncome(availableIncome);
+        } catch (error) {
+            console.error('Error fetching available income:', error);
+        }
+    };
+    
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed, so add 1
+        const day = String(date.getDate()).padStart(2, '0');
+        
+        return `${year}-${month}-${day}`;
+      };
+      
+
+    const showAddMoneyToGoalModal = async (goal) => {
+        const user = JSON.parse(localStorage.getItem('users'));
+        await fetchAvailableIncome(user._id);
+        setSelectedGoal(goal);
+        setShowAddMoneyModal(true);
+    };
+
+    const handleAddTransaction = async (transactionData) => {
+        try {
+            const response = await axios.post('/api/transactions/add-transaction', transactionData);
+            if (response.status === 200) {
+                fetchGoals();
+                message.success('Transaction added successfully');
+            } else {
+                throw new Error('Failed to add transaction');
+            }
+        } catch (error) {
+            console.error('Error adding transaction:', error);
+            message.error('Something went wrong');
+        }
+    };
+
+    const handleDeleteTransaction = async (transactionId) => {
+        try {
+            const response = await axios.post('/api/transactions/delete-transaction', { transactionId });
+            if (response.status === 200) {
+                fetchGoals();
+                message.success('Transaction deleted successfully');
+            } else {
+                throw new Error('Failed to delete transaction');
+            }
+        } catch (error) {
+            console.error('Error deleting transaction:', error);
+            message.error('Something went wrong');
+        }
+    };
+
+    const handleAddMoney = async (values) => {
+        try {
+            const user = JSON.parse(localStorage.getItem('users'));
+            const amountToAdd = parseFloat(values.amount);
+            if (amountToAdd > availableIncome) {
+                message.error('Amount exceeds available income');
+                return;
+            }
+
+            const transactionData = {
+                userid: user._id,
+                amount: amountToAdd,
+                type: 'Expense',
+                category: 'Goal Contribution',
+                date: new Date(),
+                description: `Added $${amountToAdd} to goal: ${selectedGoal.name}`,
+                goalId: selectedGoal._id,
+            };
+
+            await handleAddTransaction(transactionData);
+            setShowAddMoneyModal(false);
+        } catch (error) {
+            console.error('Error adding money to goal:', error);
+            message.error('Something went wrong');
+        }
     };
 
     useEffect(() => {
-        budgets.forEach(budget => {
-            const transactionsWithinRange = transactions.filter(transaction => {
-                return transaction.category === budget.category &&
-                    new Date(transaction.date) >= new Date(budget.startDate) &&
-                    new Date(transaction.date) <= new Date(budget.endDate);
-            });
+        fetchGoals();
+    })
+    
+    function calculateRemainingDays(targetDate) {
+        const today = new Date();
+        const target = new Date(targetDate);
+        const timeDiff = target.getTime() - today.getTime();
+        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-            const totalSpentWithinRange = transactionsWithinRange.reduce((total, transaction) => total + transaction.amount, 0);
-            const progressPercent = (totalSpentWithinRange / budget.amount) * 100;
-            const isOverSpent = totalSpentWithinRange > budget.amount;
-            const overSpentAmount = isOverSpent ? (totalSpentWithinRange - budget.amount).toFixed(2) : 0;
-
-            if (progressPercent > 100 && !hundredPercentWarnings.includes(budget._id)) {
-                setHundredPercentWarnings(prevWarnings => [...prevWarnings, budget._id]);
-                notification.error({
-                    message: `Over Budget Alert: ${budget.category}`,
-                    description: `You have spent over 100% of the budget for ${budget.category}, with the overspent amount of $${overSpentAmount}.`,
-                    duration: 10
-                });
-            } else if (progressPercent >= 90 && progressPercent <= 100 && !hundredPercentWarnings.includes(budget._id)) {
-                setHundredPercentWarnings(prevWarnings => [...prevWarnings, budget._id]);
-                notification.warning({
-                    message: `Budget Warning: ${budget.category}`,
-                    description: `You have spent 90% or more of the budget for ${budget.category}.`,
-                    duration: 10
-                });
-            }
-        });
-    }, [budgets, transactions, hundredPercentWarnings]);
-
-    useEffect(() => {
-        console.log("Transactions:", transactions); // Add this line
-    }, [transactions]);
-
+        if (daysDiff === 0) {
+            return 'Today';
+        } else if (daysDiff === 1) {
+            return 'Tomorrow';
+        } else if (daysDiff < 0) {
+            return 'Expired';
+        } else if (daysDiff <= 7) {
+            return `${daysDiff} day(s) left`;
+        } else if (daysDiff <= 28) {
+            const weeksLeft = Math.ceil(daysDiff / 7);
+            return `${weeksLeft} week(s) left`;
+        } else if (daysDiff <= 30) {
+            return '1 month left';
+        } else if (daysDiff <= 365) {
+            const monthsLeft = Math.ceil(daysDiff / 30);
+            return `${monthsLeft} month(s) left`;
+        } else {
+            const yearsLeft = Math.ceil(daysDiff / 365);
+            return `${yearsLeft} year(s) left`;
+        }
+    }
 
     const treeData = [
         {
@@ -735,101 +781,255 @@ function Set_budget() {
         }
     };
 
-    const twoColors = { '0%': '#108ee9', '100%': '#EA2727' };
 
     return (
         <DefaultLayout>
             <div className='filter d-flex justify-content-between align-items-center'>
                 <button
                     className='primary'
-                    style={{ color: 'aliceblue' }}
-                    onClick={() => setShowAddEditBudgetModal(true)}>
-                    ADD BUDGET
+                    onClick={() => setShowAddEditGoalModal(true)}
+                    style={{ backgroundColor: '#176f44', borderColor: '#176f44' }}
+
+                >
+                    ADD GOAL
                 </button>
+                <div className="toggle-buttons">
+                    <Segmented
+                        className="custom-segmented"
+                        options={[
+                            { label: 'Current', value: '1' },
+                            { label: 'Achieved', value: '2' }
+                        ]}
+                        value={activeTab}
+                        onChange={setActiveTab}
+                    />
+                </div>
             </div>
-    
+
             <Modal
-                title={selectItemForEdit ? 'Edit Budget' : 'Add Budget'}
-                open={showAddEditBudgetModal}
+                title={selectItemForEdit ? 'Edit Goal' : 'Add Goal'}
+                open={showAddEditGoalModal}
                 onCancel={() => {
-                    setSelectItemForEdit(null); // Reset the state
-                    setShowAddEditBudgetModal(false);
+                    setSelectItemForEdit(null);
+                    setShowAddEditGoalModal(false);
                 }}
                 footer={null}
             >
-                <Form layout='vertical' className='transaction-form budget-form' onFinish={onFinish} initialValues={selectItemForEdit}>
-                    <Form.Item label='Amount' name='amount' rules={[{ required: true, message: 'Please input the amount!' }]}>
-                        <Input type='number' placeholder='Enter amount' />
+                <Form
+                    layout='vertical'
+                    className='transaction-form budget-form'
+                    form={form}
+                    onFinish={onFinish}
+                    initialValues={
+                        selectItemForEdit
+                            ? {
+                                ...selectItemForEdit,
+                                targetDate: selectItemForEdit.targetDate !== 'No due date' ? moment(selectItemForEdit.targetDate) : null,
+                            }
+                            : {}
+                    }
+                >
+                    <Form.Item
+                        label='Goal Name'
+                        name='name'
+                        rules={[{ required: true, message: 'Please input the goal name!' }]}
+                    >
+                        <Input type='text' placeholder='Enter goal name' />
                     </Form.Item>
-    
-                    <Form.Item label='Date Range' name='dateRange' rules={[{ required: true, message: 'Please select the date range!' }]}>
-                        <RangePicker disabledDate={disabledDate} />
+
+                    <Form.Item
+                        label='Target Amount'
+                        name='targetAmount'
+                        rules={[{ required: true, message: 'Please input the target amount!' }]}
+                    >
+                        <Input type='number' placeholder='Enter target amount' />
                     </Form.Item>
-    
-                    <Form.Item label="Category" name="category">
+
+                    <Form.Item
+                        label='Target Date'
+                        name='targetDate'
+                        rules={[{ required: !noDueDate, message: 'Please select the target date!' }]}
+                    >
+                        <Checkbox
+                            style={{ marginRight: 8 }}
+                            onChange={(e) => setNoDueDate(e.target.checked)}
+                        >
+                            No due date
+                        </Checkbox>
+                        <DatePicker disabled={noDueDate} disabledDate={(current) => current && current < moment().startOf('day')} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label='Category'
+                        name='category'
+                        rules={[{ required: true, message: 'Please select a category!' }]}
+                    >
                         <TreeSelect
                             style={{ width: '100%' }}
                             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                            placeholder="Please select"
-                            treeData={treeData.map(node => ({
+                            placeholder='Please select'
+                            treeData={treeData.map((node) => ({
                                 ...node,
                                 icon: node.icon ? <i className={node.icon} /> : null,
-                                children: node.children ? node.children.map(child => ({
-                                    ...child,
-                                    icon: child.icon ? <i className={child.icon} /> : null,
-                                })) : null,
+                                children: node.children
+                                    ? node.children.map((child) => ({
+                                        ...child,
+                                        icon: child.icon ? <i className={child.icon} /> : null,
+                                    }))
+                                    : null,
                             }))}
                         />
                     </Form.Item>
-    
+
+                    <Form.Item label='Description' name='description'>
+                        <Input.TextArea placeholder='Enter goal description' />
+                    </Form.Item>
+
                     <Button type='primary' htmlType='submit'>
                         SAVE
                     </Button>
                 </Form>
             </Modal>
-    
-            <div className='budget-table'>
-            {budgets.map((budget) => {
-                const spentForCategory = totalSpent[budget.category] || 0;
-                const isOverSpent = spentForCategory > budget.amount;
-                const overSpentAmount = isOverSpent ? (spentForCategory - budget.amount).toFixed(2) : 0;
-                let progressPercent = (spentForCategory / budget.amount) * 100;
-                return (
-                    <div key={budget._id} className='budget-item'>
-                        <div className='budget-item-details'>
-                            <div className='budget-item-category'>
-                                {renderCategoryIcon(budget.category)}
-                                <span className='category-name'>{budget.category}</span>
+
+            <div className='goal-table'>
+                {activeTab === "1" && goals.filter(goal => goal.currentAmount < goal.targetAmount).map((goal) => {
+                    const isGoalReached = goal.currentAmount >= goal.targetAmount;
+                    const progressPercent = (goal.currentAmount / goal.targetAmount) * 100;
+                    const neededValue = goal.targetAmount - goal.currentAmount;
+
+                    return (
+                        <div key={goal._id} className='goal-item'>
+                            <div className='goal-item-details'>
+                                <div className='goal-item-category'>
+                                    {renderCategoryIcon(goal.category)}
+                                    <span className='goal-name'>{goal.name}</span>
+                                </div>
+                                <div className="progress-container">
+                                    <div className="progress-top">
+                                        <span className="target-amount">${goal.targetAmount.toFixed(2)}</span>
+                                        <span className="remain-days">{goal.targetDate === 'No due date' ? 'No due date' : calculateRemainingDays(goal.targetDate)}</span>
+                                    </div>
+                                    <Progress
+                                        percent={progressPercent.toFixed(2)}
+                                        showInfo={false}
+                                        format={percent => `${percent}%`}
+                                        strokeColor={'green'}
+                                    />
+                                    <div className="progress-bottom">
+                                        <span className="current-value">${goal.currentAmount} stashed</span>
+                                        <span className="needed-value">${neededValue} to stash</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div className='budget-item-info'>
-                                <span>Spent: ${spentForCategory}</span>
-                                <span>Total: ${budget.amount}</span>
-                                <span>Remaining Days: {budget.remainingDays}</span>
-                                <Progress size={[1010, 25]} percent={progressPercent.toFixed(2)} showInfo={true} strokeColor={twoColors} />
+                            <div className='goal-item-actions'>
+                                <EditOutlined
+                                    onClick={() => {
+                                        setSelectItemForEdit(goal);
+                                        setShowAddEditGoalModal(true);
+                                    }}
+                                />
+                                <Popconfirm
+                                    title='Are you sure to delete this goal?'
+                                    onConfirm={() => deleteGoal(goal)}
+                                    okText='Yes'
+                                    cancelText='No'
+                                >
+                                    <DeleteOutlined className='mx-3' />
+                                </Popconfirm>
+                                <Button
+                                    type='primary'
+                                    disabled={isGoalReached}
+                                    onClick={() => showAddMoneyToGoalModal(goal)}
+                                    style={{ backgroundColor: '#176f44', borderColor: '#176f44' }}
+                                >
+                                    Add Money
+                                </Button>
+
                             </div>
                         </div>
-                        <div className='budget-item-actions'>
-                            <EditOutlined
-                                onClick={() => {
-                                    setSelectItemForEdit(budget);
-                                    setShowAddEditBudgetModal(true);
-                                }}
-                            />
-                            <Popconfirm
-                                title='Are you sure to delete this budget?'
-                                onConfirm={() => deleteBudget(budget)}
-                                okText='Yes'
-                                cancelText='No'
-                            >
-                                <DeleteOutlined className='mx-3' />
-                            </Popconfirm>
+                    );
+                })}
+                {activeTab === "2" && goals.filter(goal => goal.currentAmount >= goal.targetAmount).map((goal) => {
+                    const progressPercent = (goal.currentAmount / goal.targetAmount) * 100;
+                    // notification.success({
+                    //     message: 'Congratulations!',
+                    //     description: 'You have achieved your goal',
+                    //     duration: 10,
+                    // });
+                    return (
+                        <div key={goal._id} className='goal-item'>
+                            <div className='goal-item-details'>
+                                <div className='goal-item-category'>
+                                    {renderCategoryIcon(goal.category)}
+                                    <span className='goal-name'>{goal.name}</span>
+                                </div>
+                                <div className="progress-container">
+                                    <div className="progress-top">
+                                        <span className="target-amount">${goal.targetAmount.toFixed(2)}</span>
+                                        <span className="remain-days">{goal.targetDate === 'No due date' ? 'No due date' : calculateRemainingDays(goal.targetDate)}</span>
+                                    </div>
+                                    <Progress
+                                        percent={progressPercent.toFixed(2)}
+                                        showInfo={false}
+                                        format={percent => `${percent}%`}
+                                        strokeColor={'green'}
+                                    />
+                                    <div className="progress-bottom">
+                                        <span className="current-value">${goal.currentAmount.toFixed(2)} stashed</span>
+                                        <span className="needed-value">Complete</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='goal-item-actions'>
+                                <EditOutlined
+                                    onClick={() => {
+                                        setSelectItemForEdit(goal);
+                                        setShowAddEditGoalModal(true);
+                                    }}
+                                />
+                                <Popconfirm
+                                    title='Are you sure to delete this goal?'
+                                    onConfirm={() => deleteGoal(goal)}
+                                    okText='Yes'
+                                    cancelText='No'
+                                >
+                                    <DeleteOutlined className='mx-3' />
+                                </Popconfirm>
+                                <Button
+                                    type='primary'
+                                    disabled={true}
+                                    onClick={() => showAddMoneyToGoalModal(goal)}
+                                >
+                                    Achieved
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                );
-            })}
+                    );
+                })}
             </div>
+
+            <Modal
+                title={`Add Money to Goal: ${selectedGoal?.name}`}
+                visible={showAddMoneyModal}
+                onCancel={() => setShowAddMoneyModal(false)}
+                footer={null}
+            >
+                <p>Available Income: ${availableIncome.toFixed(2)}</p>
+                <Form layout='vertical' onFinish={handleAddMoney} className='transaction-form budget-form'>
+                    <Form.Item
+                        label='Amount'
+                        name='amount'
+                        rules={[{ required: true, message: 'Please input the amount!' }]}
+                    >
+                        <Input type='number' placeholder='Enter amount' />
+                    </Form.Item>
+                    <Button type='primary' htmlType='submit'>
+                        Add Money
+                    </Button>
+                </Form>
+            </Modal>
         </DefaultLayout>
     );
-}
+};
 
-export default Set_budget;
+export default Goal;
