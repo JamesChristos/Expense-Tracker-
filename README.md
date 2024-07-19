@@ -25,3 +25,40 @@ To get started with the Expense Tracker Project, follow these steps:
 1. Clone the repository:
    ```bash
    git clone https://github.com/JamesChristos/Expense-Tracker-.git
+
+2. Navigate to the project directory:
+   ```bash
+   cd Expense-Tracker-
+
+3. Install the necessary dependencies:
+   ```bash
+   npm install
+
+4. Start the application:
+   ```bash
+   npm start
+
+## Usage
+1. Adding Transactions: Use the OCR feature to scan receipts or manually input transactions.
+2. Setting Goals: Navigate to the budget or savings section to set your financial goals.
+3. Monitoring Progress: Check the dashboard to monitor your spending, savings, and budget adherence.
+4. Exporting Data: Use the export feature to save your transaction data in PDF or CSV format.
+
+## Contributing
+Contributions are welcome! If you would like to contribute to this project, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch (git checkout -b feature/your-feature-name).
+3. Make your changes and commit them (git commit -m 'Add some feature').
+4. Push to the branch (git push origin feature/your-feature-name).
+5. Open a pull request.
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Contact
+If you have any questions or suggestions, feel free to reach out:
+
+James Christos
+GitHub: JamesChristos
+Email: sereiraksa.ouk@gmail.com
