@@ -1,4 +1,5 @@
 # Expense Tracker Project
+![Screenshot 2024-07-01 224436](https://github.com/user-attachments/assets/f505ad7b-938b-44ab-a126-a6014ff56bc9)
 
 ## Table of Contents
 - [Overview](#overview)
@@ -59,6 +60,6 @@ This project is licensed under the MIT License. See the LICENSE file for details
 ## Contact
 If you have any questions or suggestions, feel free to reach out:
 
-James Christos
-GitHub: JamesChristos
-Email: sereiraksa.ouk@gmail.com
+- **James Christos**
+- **GitHub:** JamesChristos
+- **Email:** sereiraksa.ouk@gmail.com
